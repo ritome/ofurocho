@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>お風呂帖 説明書 — HITONOWA STUDIO</title>
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base:       #fdf9ee;
+      --accent-main:   #c69a4d;
+      --accent-deep:   #9a7232;
+      --accent-light:  #f8edcf;
+      --text-primary:  #2d2820;
+      --text-soft:     #786c5a;
+      --border:        #e3d8b8;
+      --warn-red:      #b8503a;
+      --done-bg:       #ede6d0;
+      --done-border:   #d6c89c;
+      --card-bg:       #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", sans-serif;
+      font-size: 15px;
+      line-height: 1.8;
+      font-feature-settings: "palt";
+    }
+
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    /* 表紙ヘッダー */
+    .cover {
+      text-align: center;
+      padding: 60px 20px 50px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .cover-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--accent-deep);
+      margin: 0 0 16px;
+      text-transform: uppercase;
+    }
+
+    .cover-title {
+      font-family: "Noto Serif JP", serif;
+      font-size: 48px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .cover-ruby {
+      display: block;
+      font-size: 14px;
+      color: var(--text-soft);
+      letter-spacing: 0.3em;
+      margin-top: 8px;
+      font-weight: 400;
+      font-family: "Noto Sans JP", sans-serif;
+    }
+
+    .cover-sub {
+      font-size: 14px;
+      color: var(--text-soft);
+      margin-top: 24px;
+      letter-spacing: 0.05em;
+    }
+
+    .cover-studio {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--text-soft);
+      margin-top: 40px;
+    }
+
+    /* 目次 */
+    .toc {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 28px;
+      margin: 0 0 48px;
+    }
+
+    .toc h2 {
+      font-family: "Noto Serif JP", serif;
+      font-size: 16px;
+      font-weight: 500;
+      margin: 0 0 12px;
+      color: var(--accent-deep);
+    }
+
+    .toc ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      padding: 4px 0;
+      counter-increment: toc;
+    }
+
+    .toc li::before {
+      content: counter(toc, decimal-leading-zero) ". ";
+      color: var(--text-soft);
+      font-size: 12px;
+      margin-right: 8px;
+    }
+
+    .toc a {
+      color: var(--text-primary);
+      text-decoration: none;
+      border-bottom: 1px dashed transparent;
+    }
+
+    .toc a:hover {
+      border-bottom-color: var(--accent-main);
+      color: var(--accent-deep);
+    }
+
+    /* セクション */
+    section {
+      margin-bottom: 56px;
+      scroll-margin-top: 20px;
+    }
+
+    section h2 {
+      font-family: "Noto Serif JP", serif;
+      font-size: 26px;
+      font-weight: 500;
+      margin: 0 0 8px;
+      color: var(--text-primary);
+      letter-spacing: 0.04em;
+    }
+
+    .section-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--accent-deep);
+      margin: 0 0 4px;
+      text-transform: uppercase;
+    }
+
+    .section-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--accent-main);
+      border: none;
+      margin: 0 0 28px;
+    }
+
+    section h3 {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      margin: 36px 0 12px;
+      color: var(--accent-deep);
+      padding-left: 12px;
+      border-left: 3px solid var(--accent-main);
+    }
+
+    section h4 {
+      font-size: 15px;
+      font-weight: 500;
+      margin: 20px 0 8px;
+      color: var(--text-primary);
+    }
+
+    section p {
+      margin: 0 0 12px;
+    }
+
+    /* 強調 */
+    .highlight {
+      background: linear-gradient(transparent 60%, var(--accent-light) 60%);
+      padding: 0 2px;
+    }
+
+    /* 番号付きステップ */
+    ol.steps {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+    }
+
+    ol.steps > li {
+      counter-increment: step;
+      padding: 12px 12px 12px 56px;
+      margin-bottom: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      position: relative;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute;
+      left: 16px;
+      top: 12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-main);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    /* キー（操作・キーワード） */
+    kbd {
+      display: inline-block;
+      padding: 1px 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+      color: var(--text-primary);
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+
+    code {
+      background: var(--accent-light);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--accent-deep);
+    }
+
+    /* コラム・補足 */
+    .note {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent-main);
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+    }
+
+    .note-title {
+      font-weight: 500;
+      color: var(--accent-deep);
+      margin: 0 0 4px;
+    }
+
+    .warn {
+      background: #fbe9e3;
+      border-left: 4px solid var(--warn-red);
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+    }
+
+    .warn-title {
+      font-weight: 500;
+      color: var(--warn-red);
+      margin: 0 0 4px;
+    }
+
+    /* 二段組（並列） */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* 図解：画面のモック */
+    .mock {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      box-shadow: 0 1px 3px rgba(45, 40, 32, 0.05);
+    }
+
+    .mock-caption {
+      font-size: 12px;
+      color: var(--text-soft);
+      text-align: center;
+      margin: 8px 0 0;
+    }
+
+    .mock-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 13px;
+    }
+
+    .mock-title {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .mock-tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .mock-tab {
+      padding: 4px 10px;
+      color: var(--text-soft);
+    }
+
+    .mock-tab.is-active {
+      color: var(--accent-deep);
+      border-bottom: 2px solid var(--accent-main);
+      font-weight: 500;
+    }
+
+    /* 利用者カードのモック */
+    .mock-card-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .mock-card {
+      position: relative;
+      background: var(--bg-base);
+      border: 2px solid var(--accent-main);
+      border-radius: 6px;
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .mock-card .room {
+      font-size: 9px;
+      color: var(--text-soft);
+    }
+
+    .mock-card .name {
+      font-weight: 500;
+      font-size: 12px;
+    }
+
+    .mock-card.is-done {
+      background: var(--done-bg);
+      border-color: var(--done-border);
+      color: var(--text-soft);
+    }
+
+    .mock-card.is-done::after {
+      content: "済";
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      background: var(--accent-main);
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 8px;
+    }
+
+    .mock-card.is-unimplemented {
+      background: var(--done-bg);
+      border-color: var(--done-border);
+      border-style: dashed;
+      color: var(--text-soft);
+    }
+
+    .mock-card.is-unimplemented::after {
+      content: "未実施";
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      background: var(--text-soft);
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 8px;
+    }
+
+    .mock-card.is-short::before {
+      content: "短期";
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--accent-deep);
+      color: #fff;
+      font-size: 8px;
+      padding: 1px 4px;
+      border-radius: 6px 0 6px 0;
+    }
+
+    /* フロー図（横） */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .flow-step {
+      background: var(--card-bg);
+      border: 2px solid var(--accent-main);
+      border-radius: 8px;
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 13px;
+      min-width: 100px;
+    }
+
+    .flow-step.done {
+      background: var(--done-bg);
+      border-color: var(--done-border);
+      color: var(--text-soft);
+    }
+
+    .flow-step.warn {
+      background: #fbe9e3;
+      border-color: var(--warn-red);
+      color: var(--warn-red);
+    }
+
+    .flow-arrow {
+      font-size: 18px;
+      color: var(--accent-deep);
+    }
+
+    /* タイムライン（一日の流れ） */
+    .timeline {
+      position: relative;
+      margin: 24px 0;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .timeline-time {
+      font-size: 13px;
+      color: var(--accent-deep);
+      font-weight: 500;
+      padding-top: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    .timeline-body h4 {
+      margin: 0 0 4px;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .timeline-body p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    /* FAQ */
+    .faq {
+      margin: 8px 0 20px;
+    }
+
+    .faq-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+    }
+
+    .faq-q {
+      font-weight: 500;
+      color: var(--accent-deep);
+      margin: 0 0 6px;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    .faq-q::before {
+      content: "Q";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--accent-main);
+      font-weight: 500;
+    }
+
+    .faq-a {
+      margin: 0;
+      padding-left: 24px;
+      position: relative;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .faq-a::before {
+      content: "A";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    /* フッター */
+    footer {
+      margin-top: 80px;
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-soft);
+      letter-spacing: 0.05em;
+    }
+
+    footer .small {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      margin-top: 4px;
+    }
+
+    a.back-link {
+      display: inline-block;
+      color: var(--accent-deep);
+      font-size: 13px;
+      text-decoration: none;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    a.back-link:hover {
+      border-bottom-color: var(--accent-main);
+    }
+
+    /* 印刷用 */
+    @media print {
+      html, body {
+        background: white;
+        font-size: 11pt;
+        line-height: 1.7;
+      }
+
+      .page {
+        padding: 0;
+        max-width: none;
+      }
+
+      .cover {
+        padding: 30px 0 24px;
+        page-break-after: always;
+      }
+
+      .cover-title { font-size: 38px; }
+
+      .toc {
+        page-break-after: always;
+      }
+
+      section {
+        page-break-inside: avoid;
+        margin-bottom: 32px;
+      }
+
+      section h2 { page-break-after: avoid; }
+      section h3 { page-break-after: avoid; }
+
+      .mock, .note, .warn, .timeline-item, .faq-item, ol.steps > li {
+        page-break-inside: avoid;
+      }
+
+      a.back-link, footer .no-print { display: none; }
+
+      a { color: var(--text-primary); text-decoration: none; }
+
+      @page { margin: 18mm 16mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- 表紙 -->
+    <header class="cover">
+      <p class="cover-eyebrow">User Manual</p>
+      <h1 class="cover-title">
+        お風呂帖
+        <span class="cover-ruby">おふろちょう</span>
+      </h1>
+      <p class="cover-sub">居住型ケア施設のための入浴記録アプリ</p>
+      <p class="cover-studio">HITONOWA STUDIO</p>
+    </header>
+
+    <a href="./" class="back-link no-print">← アプリに戻る</a>
+
+    <!-- 目次 -->
+    <nav class="toc">
+      <h2>目次</h2>
+      <ol>
+        <li><a href="#intro">お風呂帖とは</a></li>
+        <li><a href="#install">アプリのインストール（はじめに一度だけ）</a></li>
+        <li><a href="#setup">最初の準備（利用者・スタッフを取り込む）</a></li>
+        <li><a href="#daily">一日の流れ</a></li>
+        <li><a href="#card">カードの見方と操作</a></li>
+        <li><a href="#schedule">予定編集モード（前日に翌日の予定を組む）</a></li>
+        <li><a href="#report">記録一覧と達成率の見方</a></li>
+        <li><a href="#staff-report">スタッフ業務量レポート</a></li>
+        <li><a href="#individual">利用者ごとの個別目標・除外</a></li>
+        <li><a href="#backup">バックアップ（一番大事）</a></li>
+        <li><a href="#print">印刷</a></li>
+        <li><a href="#faq">困ったとき・よくある質問</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1. はじめに -->
+    <section id="intro">
+      <p class="section-eyebrow">Chapter 01</p>
+      <h2>お風呂帖とは</h2>
+      <hr class="section-divider" />
+
+      <p>
+        お風呂帖は、居住型ケア施設の<span class="highlight">入浴記録を業務用にまとめて管理</span>するアプリです。
+        利用者ひとりひとりの入浴予定をカードで表示し、<strong>クリックひとつで「済」</strong>に切り替えられます。
+        月ごとの達成率や、スタッフごとの業務量も自動で集計されます。
+      </p>
+
+      <h3>3つの大切な約束</h3>
+      <ol class="steps">
+        <li><strong>データはこのPCの中にだけ保存されます。</strong>外部に送信されません。安心して利用者氏名を入れてください。</li>
+        <li><strong>バックアップは手動です。</strong>毎日の終業時に「JSONをダウンロード」を押してください（リマインダーが自動で出ます）。</li>
+        <li><strong>すべての操作は自動保存です。</strong>「保存」ボタンを押す必要はほとんどありません。</li>
+      </ol>
+
+      <div class="note">
+        <p class="note-title">読み方</p>
+        <p>「お風呂帖」は <strong>おふろちょう</strong> と読みます。「ちょう」は記録帖（ちょう）の「帖」です。</p>
+      </div>
+    </section>
+
+    <!-- 2. インストール -->
+    <section id="install">
+      <p class="section-eyebrow">Chapter 02</p>
+      <h2>アプリのインストール（はじめに一度だけ）</h2>
+      <hr class="section-divider" />
+
+      <p>施設のWindowsデスクトップPCで、Chrome または Microsoft Edge を使います。</p>
+
+      <ol class="steps">
+        <li>ブラウザで <code>https://ritome.github.io/ofurocho/</code> を開く</li>
+        <li>アドレスバーの右端にある <strong>「インストール」アイコン</strong>（パソコンに下向きの矢印が描かれたマーク）をクリック</li>
+        <li>確認ダイアログが出たら <strong>「インストール」</strong> をクリック</li>
+        <li>デスクトップ・スタートメニュー・タスクバーに <strong>「お風呂帖」アイコン</strong> が追加されます</li>
+      </ol>
+
+      <div class="note">
+        <p class="note-title">これでネットがつながらなくても起動できます</p>
+        <p>
+          一度インストールすると、ブラウザを介さずアプリのように起動できます。
+          ネット接続がなくても、最後に開いた状態のまま動作します（記録もできます）。
+        </p>
+      </div>
+
+      <div class="warn">
+        <p class="warn-title">アンインストールは慎重に</p>
+        <p>
+          アプリを削除すると、このPCに保存されているすべての記録も消えます。
+          必ず先に「JSONをダウンロード」でバックアップを取ってください。
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. 最初の準備 -->
+    <section id="setup">
+      <p class="section-eyebrow">Chapter 03</p>
+      <h2>最初の準備（利用者・スタッフを取り込む）</h2>
+      <hr class="section-divider" />
+
+      <p>初回起動時は、まず<strong>利用者一覧とスタッフ一覧</strong>をExcelファイルから取り込みます。</p>
+
+      <h3>① 書式サンプルをダウンロード</h3>
+      <ol class="steps">
+        <li>画面上の <kbd>設定</kbd> タブをクリック</li>
+        <li>「📋 利用者・スタッフを取り込み」のカードにある <strong>「📑 書式サンプルをダウンロード」</strong> をクリック</li>
+        <li><code>ofurocho_書式サンプル.xlsx</code> がダウンロードされます</li>
+      </ol>
+
+      <h3>② サンプルExcelを編集する</h3>
+
+      <p>サンプルExcelには 2つのシートがあります。</p>
+
+      <div class="grid-2">
+        <div class="mock">
+          <div class="mock-title" style="font-size:14px;color:var(--accent-deep);margin-bottom:8px">シート1：利用者</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:var(--bg-base)">
+                <th style="border:1px solid var(--border);padding:4px">部屋番号</th>
+                <th style="border:1px solid var(--border);padding:4px">名前</th>
+                <th style="border:1px solid var(--border);padding:4px">フリガナ</th>
+                <th style="border:1px solid var(--border);padding:4px">区分</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="border:1px solid var(--border);padding:4px">さくら</td><td style="border:1px solid var(--border);padding:4px">山田 太郎</td><td style="border:1px solid var(--border);padding:4px">ヤマダ タロウ</td><td style="border:1px solid var(--border);padding:4px">通常</td></tr>
+              <tr><td style="border:1px solid var(--border);padding:4px">すみれ</td><td style="border:1px solid var(--border);padding:4px">佐藤 静子</td><td style="border:1px solid var(--border);padding:4px">サトウ シズコ</td><td style="border:1px solid var(--border);padding:4px">通常</td></tr>
+              <tr><td style="border:1px solid var(--border);padding:4px">ばら</td><td style="border:1px solid var(--border);padding:4px">高橋 敏子</td><td style="border:1px solid var(--border);padding:4px">タカハシ トシコ</td><td style="border:1px solid var(--border);padding:4px">短期</td></tr>
+            </tbody>
+          </table>
+          <p class="mock-caption">部屋番号は数字でも花の名前でもOK</p>
+        </div>
+
+        <div class="mock">
+          <div class="mock-title" style="font-size:14px;color:var(--accent-deep);margin-bottom:8px">シート2：スタッフ</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:var(--bg-base)">
+                <th style="border:1px solid var(--border);padding:4px">名前</th>
+                <th style="border:1px solid var(--border);padding:4px">職種</th>
+                <th style="border:1px solid var(--border);padding:4px">サブ役割</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="border:1px solid var(--border);padding:4px">田中 和子</td><td style="border:1px solid var(--border);padding:4px">看護師</td><td style="border:1px solid var(--border);padding:4px">入浴介助, 処置, 外回り</td></tr>
+              <tr><td style="border:1px solid var(--border);padding:4px">山本 幸子</td><td style="border:1px solid var(--border);padding:4px">支援員</td><td style="border:1px solid var(--border);padding:4px">入浴介助, 更衣, 外回り</td></tr>
+              <tr><td style="border:1px solid var(--border);padding:4px">鈴木 三郎</td><td style="border:1px solid var(--border);padding:4px">支援員</td><td style="border:1px solid var(--border);padding:4px">更衣</td></tr>
+            </tbody>
+          </table>
+          <p class="mock-caption">サブ役割はカンマで区切る</p>
+        </div>
+      </div>
+
+      <p><strong>サンプルの行を消して、施設のデータに置き換えて保存</strong>してください。</p>
+
+      <h3>③ 取り込む</h3>
+      <ol class="steps">
+        <li>同じカードの「ファイルを選択」をクリック、または<strong>カードに直接ドラッグ&ドロップ</strong></li>
+        <li>確認ダイアログ「次のデータを読み込みます：利用者◯名／スタッフ◯名」→ OK</li>
+        <li>取り込み完了。利用者一覧・スタッフ一覧に反映されます</li>
+      </ol>
+
+      <h3>④ 施設情報を入れる</h3>
+
+      <p>同じ「設定」タブの「施設情報」セクションで以下を入力：</p>
+
+      <ul>
+        <li><strong>施設名</strong>：印刷物のヘッダーに使われます</li>
+        <li><strong>入浴目標</strong>：週3回など。達成率の基準になります</li>
+        <li><strong>警告レベル</strong>：3日以上未浴を「注意」、5日以上を「警告」など</li>
+      </ul>
+    </section>
+
+    <!-- 4. 一日の流れ -->
+    <section id="daily">
+      <p class="section-eyebrow">Chapter 04</p>
+      <h2>一日の流れ</h2>
+      <hr class="section-divider" />
+
+      <p>普段の運用イメージはこんな感じです。</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-time">前日 16:00</div>
+          <div class="timeline-body">
+            <h4>📝 リーダーが翌日の予定を組む</h4>
+            <p>「予定を編集 →」ボタン → 利用者カードをクリックして午前/午後に振り分け → 印刷して脱衣所に貼る</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-time">当日 朝</div>
+          <div class="timeline-body">
+            <h4>👥 体制を入力（あとからでもOK）</h4>
+            <p>「体制を入力 →」ボタン → 入浴介助・処置・更衣・外回りの担当を選択 → 保存</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-time">9:00〜</div>
+          <div class="timeline-body">
+            <h4>🛁 入浴中、カードをクリックして「済」に</h4>
+            <p>入浴が終わるたびに該当する利用者カードをクリック。1クリックで記録完了。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-time">入れなかった人</div>
+          <div class="timeline-body">
+            <h4>✕ 「未実施」として理由付きで残す</h4>
+            <p>カードにマウスを乗せて「…」をクリック → 理由を選んで記録。月次の振り返りに使えます。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-time">昼休み後</div>
+          <div class="timeline-body">
+            <h4>👥 午後の体制を入力（午後がある日のみ）</h4>
+            <p>体制設定モーダルで「午後」を選択 → 担当を入力。</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-time">終業時</div>
+          <div class="timeline-body">
+            <h4>💾 バックアップ</h4>
+            <p>「設定」タブ →「📥 入浴記録をバックアップ」→ JSONファイルがダウンロードフォルダに保存される。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. カードの見方 -->
+    <section id="card">
+      <p class="section-eyebrow">Chapter 05</p>
+      <h2>カードの見方と操作</h2>
+      <hr class="section-divider" />
+
+      <p>入浴記録タブには、その日の予定が利用者カードで5列に並びます。</p>
+
+      <div class="mock">
+        <div class="mock-tabs">
+          <span class="mock-tab is-active">入浴記録</span>
+          <span class="mock-tab">記録一覧</span>
+          <span class="mock-tab">設定</span>
+        </div>
+        <div class="mock-card-grid">
+          <div class="mock-card">
+            <div class="room">さくら</div>
+            <div class="name">山田 太郎</div>
+          </div>
+          <div class="mock-card is-done">
+            <div class="room">すみれ</div>
+            <div class="name">佐藤 静子</div>
+          </div>
+          <div class="mock-card is-short">
+            <div class="room">ばら</div>
+            <div class="name">高橋 敏子</div>
+          </div>
+          <div class="mock-card is-unimplemented">
+            <div class="room">ひまわり</div>
+            <div class="name">鈴木 一郎</div>
+          </div>
+          <div class="mock-card">
+            <div class="room">きく</div>
+            <div class="name">伊藤 花子</div>
+          </div>
+        </div>
+        <p class="mock-caption">5名のカード（左から：予定 / 済 / 短期入所 / 未実施 / 予定）</p>
+      </div>
+
+      <h3>カードの状態</h3>
+
+      <div class="grid-2">
+        <div class="note">
+          <p class="note-title">⚪ 予定（白背景＋山吹枠）</p>
+          <p>これから入浴する人。クリックすると「済」になります。</p>
+        </div>
+        <div class="note">
+          <p class="note-title">🟫 済（くすみ背景＋済ピル）</p>
+          <p>記録済み。もう一度クリックで予定に戻ります。</p>
+        </div>
+        <div class="note">
+          <p class="note-title">🟧 短期（左上にリボン）</p>
+          <p>短期入所の方。一目で分かります。</p>
+        </div>
+        <div class="note">
+          <p class="note-title">⚫ 未実施（破線枠＋未実施ピル）</p>
+          <p>理由付きで「入れなかった」記録。クリックで予定に戻せます。</p>
+        </div>
+      </div>
+
+      <h3>「未実施」の記録方法</h3>
+
+      <ol class="steps">
+        <li>カードの上にマウスを乗せると、右上に <strong>「…」アイコン</strong> が現れます</li>
+        <li>「…」をクリック → ポップアップ「未実施として記録」が出る</li>
+        <li>理由を選択：<strong>時間切れ／体調不良／通院／入院中／その他</strong></li>
+        <li>必要ならメモを入力</li>
+        <li>「未実施として記録」をクリック</li>
+      </ol>
+
+      <div class="note">
+        <p class="note-title">どうして未実施を残すの？</p>
+        <p>
+          「予定だったけど入れなかった」が分かるので、月次の振り返りで <strong>本当の達成率</strong> が見えます。
+          達成率の数字が低い時、原因（時間切れ／体調不良など）が一目で分かるのが大事です。
+        </p>
+      </div>
+    </section>
+
+    <!-- 6. 予定編集モード -->
+    <section id="schedule">
+      <p class="section-eyebrow">Chapter 06</p>
+      <h2>予定編集モード（前日に翌日の予定を組む）</h2>
+      <hr class="section-divider" />
+
+      <p>リーダーが、明日の入浴予定を全利用者から選んで組むモードです。</p>
+
+      <h3>入り方</h3>
+      <ol class="steps">
+        <li>入浴記録タブの右上にある <strong>「予定を編集 →」</strong> をクリック</li>
+        <li>画面が「予定編集モード」に切り替わる（山吹色のバナーが目印）</li>
+        <li>右上の「← 記録に戻る」で戻れます</li>
+      </ol>
+
+      <h3>使い方</h3>
+
+      <p>編集モードでは <strong>全利用者（在籍中）</strong> がカードで表示されます。</p>
+
+      <ol class="steps">
+        <li>日付ナビ（‹ ›）で対象日を選ぶ。デフォルトは <strong>翌日</strong></li>
+        <li>「午前」または「午後」のタブを選択（これが <strong>追加先</strong>）</li>
+        <li>未予定のカードをクリック → そのセッションに追加されます</li>
+        <li>もう一度クリック → 取消（未予定に戻る）</li>
+        <li>別セッションのカードをクリック → そちらに移動</li>
+      </ol>
+
+      <h3>並び替えとフィルタ</h3>
+
+      <p>長い名簿の中から「優先したい人」を見つけるための機能です。</p>
+
+      <ul>
+        <li><strong>並び：最終入浴が古い順</strong>（既定）→ 入っていない人ほど上に</li>
+        <li><strong>フィルタ：3日以上未浴</strong>→ 注意・警告レベルの人だけ表示</li>
+        <li><strong>名前で検索</strong>→ 名前・フリガナ・部屋名のいずれでもOK</li>
+      </ul>
+
+      <h3>警告レベル</h3>
+
+      <div class="flow">
+        <div class="flow-step">通常<br><small>0〜2日</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step done">注意<br><small>3〜4日</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step warn">警告<br><small>5日以上</small></div>
+      </div>
+
+      <p>最終入浴日からの経過日数で、注意（深山吹色＋三角）／警告（朱色＋枠が朱）に変化します。
+        しきい値は設定タブの「警告レベル」で変更できます。</p>
+
+      <h3>予定を印刷</h3>
+
+      <p>右上の<strong>「🖨 午前を印刷」「午後を印刷」「両方を印刷」</strong>から、A4縦の入浴予定表が印刷できます。
+        担当看護師・担当支援員の手書き欄もついています。脱衣所に貼って活用してください。</p>
+    </section>
+
+    <!-- 7. 記録一覧 -->
+    <section id="report">
+      <p class="section-eyebrow">Chapter 07</p>
+      <h2>記録一覧と達成率の見方</h2>
+      <hr class="section-divider" />
+
+      <p>「記録一覧」タブで、過去の記録を集計して見られます。</p>
+
+      <h3>4つのビュー</h3>
+
+      <ul>
+        <li><strong>週</strong>（既定）：利用者×曜日のマトリクス。朝/午バッジで一覧</li>
+        <li><strong>月</strong>：1ヶ月の入浴回数と達成率（バー）。レポート向き</li>
+        <li><strong>半年</strong>：6ヶ月分の達成率を月ごとに横並び</li>
+        <li><strong>年</strong>：12ヶ月分の達成率を一望</li>
+      </ul>
+
+      <h3>達成率のレベル</h3>
+
+      <div class="flow">
+        <div class="flow-step done" style="background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)">達成<br><small>100%以上</small></div>
+        <div class="flow-step">標準<br><small>50〜99%</small></div>
+        <div class="flow-step">注意<br><small>33〜49%</small></div>
+        <div class="flow-step warn">警告<br><small>33%未満</small></div>
+      </div>
+
+      <p>達成率は <code>月の入浴回数 ÷ 目標</code>。目標 = 設定の週N回 × その月の週数 です。</p>
+
+      <h3>Excel出力</h3>
+
+      <p><strong>「📊 Excelで出力」</strong>ボタンで、表示中のビューをそのまま .xlsx ファイルに変換できます。
+        看護長への提出資料や、年度末のまとめにご利用ください。</p>
+
+      <h3>印刷レポート</h3>
+
+      <p><strong>「🖨 印刷」</strong>ボタンで、A4で印刷できます。
+        週・月はA4縦、半年・年は<strong>自動でA4横</strong>になります。施設名と日付がヘッダーに自動で入ります。</p>
+    </section>
+
+    <!-- 8. スタッフ業務量 -->
+    <section id="staff-report">
+      <p class="section-eyebrow">Chapter 08</p>
+      <h2>スタッフ業務量レポート</h2>
+      <hr class="section-divider" />
+
+      <p>記録一覧タブの上部に <strong>「利用者別／スタッフ別」</strong> という切替があります。
+        スタッフ別を選ぶと、月単位でスタッフごとの業務量が見られます。</p>
+
+      <ul>
+        <li>名前ごとに <strong>入浴介助／処置／更衣／外回り</strong> の回数を集計</li>
+        <li>並び替え：「入浴介助 多い順」「合計 多い順」など</li>
+        <li>看護師・支援員フィルタ</li>
+        <li>Excel出力可（同じExcelボタンから）</li>
+      </ul>
+
+      <div class="note">
+        <p class="note-title">業務の偏りチェックに</p>
+        <p>
+          「入浴介助 ◯◯さんに偏ってないか？」「外回りは均等か？」を毎月チェックできます。
+          シフト調整や、スタッフ間の納得感づくりに役立ちます。
+        </p>
+      </div>
+
+      <div class="warn">
+        <p class="warn-title">体制を入力していない記録は集計に出ません</p>
+        <p>
+          スタッフ別レポートは「体制設定モーダル」で入力したデータから集計します。
+          体制を入れていない日の記録はカウントされないので、毎日入力しておくのがおすすめです（あとからでもOK）。
+        </p>
+      </div>
+    </section>
+
+    <!-- 9. 個別目標 -->
+    <section id="individual">
+      <p class="section-eyebrow">Chapter 09</p>
+      <h2>利用者ごとの個別目標・除外</h2>
+      <hr class="section-divider" />
+
+      <p>「全員 週3回」では実態に合わない人もいます。たとえば：</p>
+
+      <ul>
+        <li>皮膚状態が悪く、入浴頻度を週1回に控える人</li>
+        <li>終末期で入浴をしないと判断した人</li>
+        <li>医療的な禁忌で当面入浴できない人</li>
+      </ul>
+
+      <p>こういう人を、達成率の対象から外したり、個別の目標を設定したりできます。</p>
+
+      <h3>設定方法</h3>
+
+      <ol class="steps">
+        <li>「設定」タブ → 利用者セクションの <strong>「利用者一覧・目標設定」</strong> をクリック</li>
+        <li>該当の利用者の右にある <strong>「編集」</strong> をクリック</li>
+        <li>個別目標：「デフォルト」または「週X回」</li>
+        <li>目標除外：チェックを入れて理由を記入</li>
+        <li>保存</li>
+      </ol>
+
+      <h3>反映先</h3>
+
+      <ul>
+        <li><strong>達成率</strong>：除外された利用者は「—」と表示。サマリでは「目標除外 N名」として別カウント</li>
+        <li><strong>警告</strong>：除外された利用者は警告色（朱・三角）が出ません</li>
+        <li><strong>予定編集</strong>：警告対象から外れます</li>
+      </ul>
+
+      <div class="note">
+        <p class="note-title">名前・部屋・区分は変えられません</p>
+        <p>
+          名前や部屋などの基本情報は <strong>Excel取り込みで更新</strong> してください。
+          個別目標と目標除外だけが、アプリ内で編集できます。
+        </p>
+      </div>
+    </section>
+
+    <!-- 10. バックアップ -->
+    <section id="backup">
+      <p class="section-eyebrow">Chapter 10</p>
+      <h2>バックアップ（一番大事）</h2>
+      <hr class="section-divider" />
+
+      <div class="warn">
+        <p class="warn-title">これだけは絶対に忘れないでください</p>
+        <p>
+          お風呂帖のデータは <strong>このPCの中（ブラウザの保存領域）</strong> にあります。
+          PCが故障したり、ブラウザの履歴を消したりすると、すべての記録が失われます。
+          毎日の終業時に <strong>JSONバックアップ</strong> を取ってください。
+        </p>
+      </div>
+
+      <h3>バックアップの取り方</h3>
+
+      <ol class="steps">
+        <li>「設定」タブを開く</li>
+        <li>「📥 入浴記録をバックアップ」のカードにある <strong>「JSONをダウンロード」</strong> をクリック</li>
+        <li>ダウンロードフォルダに <code>ofurocho-backup-2026-05-09.json</code> のような名前で保存される</li>
+      </ol>
+
+      <h3>毎日リマインダーが出ます</h3>
+
+      <p>最後のバックアップから <strong>24時間以上</strong> 経つと、起動時に閉じられないモーダルが出ます。</p>
+
+      <ul>
+        <li><strong>今すぐバックアップ</strong>：その場でJSONをダウンロード</li>
+        <li><strong>あとで（4時間後に再表示）</strong>：4時間スヌーズ</li>
+      </ul>
+
+      <p>3日以上バックアップが滞ると、警告は赤色になります。</p>
+
+      <h3>復元のしかた</h3>
+
+      <p>もしデータが消えてしまったり、別のPCに移したい時は：</p>
+
+      <ol class="steps">
+        <li>「設定」タブ → 「📤 バックアップから復元」のカード</li>
+        <li><strong>「直近のバックアップから戻す」</strong>（直近のバックアップが残っていれば）</li>
+        <li>または <strong>「JSONファイルから復元」</strong> → ダウンロード済みのJSONを選択</li>
+        <li>確認ダイアログ → 復元 → ページが自動でリロードされます</li>
+      </ol>
+
+      <h3>バックアップファイルの保管場所</h3>
+
+      <p>
+        ダウンロードフォルダに残しておくだけでもいいですが、より安全にしたい場合：
+      </p>
+
+      <ul>
+        <li>USBメモリにコピーして金庫保管</li>
+        <li>施設のファイルサーバ（共有フォルダ）に毎日コピー</li>
+        <li>個人OneDriveやGoogle Driveに置く（個人情報の取り扱いに注意）</li>
+      </ul>
+    </section>
+
+    <!-- 11. 印刷 -->
+    <section id="print">
+      <p class="section-eyebrow">Chapter 11</p>
+      <h2>印刷</h2>
+      <hr class="section-divider" />
+
+      <p>お風呂帖からは2種類の印刷ができます。</p>
+
+      <h3>① 入浴予定表（明日の予定）</h3>
+
+      <p>予定編集モードの右上から：</p>
+
+      <ul>
+        <li><strong>午前を印刷</strong>：1ページ、午前の予定だけ</li>
+        <li><strong>午後を印刷</strong>：1ページ、午後の予定だけ</li>
+        <li><strong>両方を印刷</strong>：2ページ、午前と午後を別ページに</li>
+      </ul>
+
+      <p>担当看護師・担当支援員の手書き欄、入浴チェック欄（□）が付いています。脱衣所のチェック表として使えます。</p>
+
+      <h3>② 達成率レポート（月次・期間レポート）</h3>
+
+      <p>記録一覧タブの「🖨 印刷」から：</p>
+
+      <ul>
+        <li><strong>週</strong>：A4縦、利用者×曜日のマトリクス</li>
+        <li><strong>月</strong>：A4縦、月の達成率レポート</li>
+        <li><strong>半年</strong>：A4横、6ヶ月分の達成率</li>
+        <li><strong>年</strong>：A4横、12ヶ月分の達成率</li>
+      </ul>
+
+      <p>白黒プリンタでも見やすいよう、達成率バーや朝/午バッジは濃淡で識別できる作りになっています。</p>
+    </section>
+
+    <!-- 12. FAQ -->
+    <section id="faq">
+      <p class="section-eyebrow">Chapter 12</p>
+      <h2>困ったとき・よくある質問</h2>
+      <hr class="section-divider" />
+
+      <div class="faq">
+        <div class="faq-item">
+          <p class="faq-q">アプリが起動しない／真っ白な画面になる</p>
+          <p class="faq-a"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>（強制再読み込み）を試してください。それでもダメなら、ネット接続があるか確認の上、ブラウザを再起動してください。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">画面の文字が小さい</p>
+          <p class="faq-a">ブラウザのズーム機能（<kbd>Ctrl</kbd>+<kbd>+</kbd>）で拡大できます。お風呂帖は拡大しても崩れない作りです。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">利用者の名前を間違えて登録した</p>
+          <p class="faq-a">名前・部屋などはExcel取り込みからしか変更できません。Excelを修正して再度取り込んでください（既存の入浴記録は維持されます）。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">利用者を削除したい</p>
+          <p class="faq-a">Excel取り込みでその行を消して再取り込みすれば、一覧から消えます（過去の入浴記録もリセットされる点に注意してください。「目標除外」で対応できる場合はそちらを推奨）。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">バックアップを取り忘れた状態でPCが壊れた</p>
+          <p class="faq-a">残念ながら、データの復旧は困難です。これを防ぐために <strong>毎日のバックアップ</strong> をお願いしています。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">複数のPCで使いたい</p>
+          <p class="faq-a">現在のお風呂帖は <strong>1台運用</strong> が前提です。複数のPCで使いたい場合は、JSONバックアップを使って手動で同期する形になります（取った側でダウンロード→もう一台で復元）。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">スタッフが退職した</p>
+          <p class="faq-a">「設定」タブのスタッフ管理から「削除」できます。過去の体制記録は残ります（その人の名前は履歴に残ります）。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">アプリが新しくなったか分からない</p>
+          <p class="faq-a">設定タブの「アプリについて」セクションでバージョン番号が確認できます。アプリを再起動すると最新版に自動更新されます。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">過去の記録を編集したい（例：間違えて「済」にした）</p>
+          <p class="faq-a">過去の日付に戻って、入浴記録タブで該当のカードをクリックすれば取り消せます。日付を戻すには、開発者にお問い合わせください（現状UIからは戻れません）。</p>
+        </div>
+
+        <div class="faq-item">
+          <p class="faq-q">「お風呂帖」の読み方は？</p>
+          <p class="faq-a"><strong>おふろちょう</strong> です。「ちょう」は記録帖（ちょう）の「帖」を使っています。</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>お風呂帖（おふろちょう）／ HITONOWA STUDIO</div>
+      <div class="small">USER MANUAL · v1.0</div>
+    </footer>
+
+  </div>
+</body>
+</html>

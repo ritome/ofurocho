@@ -1049,6 +1049,20 @@
       border-top: 2px solid var(--border);
       border-bottom: none;
     }
+    .unit-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+      margin-right: 6px; background: #cbd5e1; vertical-align: middle; }
+    .unit-dot.is-male { background: #9cc0f5; }
+    .unit-dot.is-female { background: #c3a9ef; }
+    .skin-mark { display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 600;
+      color: #b26b00; background: #fff4e5; border: 1px solid #f0c98a; border-radius: 999px;
+      padding: 0 6px; vertical-align: middle; }
+    .matrix-group-row td { background: #f1f5f9; text-align: left; font-weight: 600;
+      color: #374151; font-size: 12px; padding: 6px 10px; border-bottom: 1px solid #e5e7eb; }
+    .matrix-table tbody tr:not(.matrix-group-row):nth-of-type(even) > td,
+    .achievement-table tbody tr:not(.matrix-group-row):nth-of-type(even) > td,
+    .period-grid-table tbody tr:not(.matrix-group-row):nth-of-type(even) > td { background: #fafbfc; }
+    .achievement-table thead th,
+    .period-grid-table thead th { position: sticky; top: 0; z-index: 2; }
 
     .matrix-bath-badge {
       display: inline-flex;
@@ -4044,6 +4058,20 @@
       );
     }
 
+    /* 共有コンポーネント: 色ドット・グループ行 */
+    function UnitDot({ resident }) {
+      const cls = resident.性別 === "男" ? "is-male" : resident.性別 === "女" ? "is-female" : "";
+      return <span className={`unit-dot ${cls}`} aria-hidden="true" />;
+    }
+
+    function MatrixGroupRow({ unit, colSpan }) {
+      return (
+        <tr className="matrix-group-row">
+          <td colSpan={colSpan}>{unit}</td>
+        </tr>
+      );
+    }
+
     /* 週マトリクスビュー */
     function WeekMatrixView({ data, today, weekStart }) {
       const days = useMemo(() => weekDays(weekStart), [weekStart]);
@@ -4131,37 +4159,44 @@
               <tbody>
                 {rows.length === 0 ? (
                   <tr><td colSpan={days.length + 3} className="matrix-empty">該当する利用者がいません</td></tr>
-                ) : rows.map(row => {
-                  const total = row.total;
-                  const totalCls = total === 0 ? "warn-critical" : total === 1 ? "warn-attention" : "";
-                  return (
-                    <tr key={row.resident.id}>
-                      <td className="col-room">{row.resident.部屋番号}</td>
-                      <td className="col-name">
-                        {row.resident.区分 === "短期" && <span className="short-mark">短</span>}
-                        {row.resident.名前}
-                      </td>
-                      {days.map((d, i) => {
-                        const dStr = ymd(d);
-                        const cell = row.byDay.get(dStr);
-                        const isToday = dStr === todayStr;
-                        return (
-                          <td key={i} className={`col-day ${isToday ? "is-today" : ""}`}>
-                            {cell?.AM && <div className="matrix-bath-badge am">朝</div>}
-                            {cell?.PM && <div className="matrix-bath-badge pm">午</div>}
-                            {!cell?.AM && !cell?.PM && <span className="matrix-empty">—</span>}
+                ) : groupResidentsByUnit(rows, (x) => x.resident).map(g => (
+                  <React.Fragment key={g.unit}>
+                    <MatrixGroupRow unit={g.unit} colSpan={days.length + 3} />
+                    {g.rows.map(row => {
+                      const total = row.total;
+                      const totalCls = total === 0 ? "warn-critical" : total === 1 ? "warn-attention" : "";
+                      return (
+                        <tr key={row.resident.id}>
+                          <td className="col-room">{row.resident.部屋番号}</td>
+                          <td className="col-name">
+                            <UnitDot resident={row.resident} />
+                            {row.resident.区分 === "短期" && <span className="short-mark">短</span>}
+                            {row.resident.名前}
+                            {row.resident.皮膚評価要 && <span className="skin-mark">皮</span>}
                           </td>
-                        );
-                      })}
-                      <td className="col-day">
-                        <span className={`matrix-week-total ${totalCls}`}>
-                          {total === 0 && <span className="warn-triangle" />}
-                          {total}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                          {days.map((d, i) => {
+                            const dStr = ymd(d);
+                            const cell = row.byDay.get(dStr);
+                            const isToday = dStr === todayStr;
+                            return (
+                              <td key={i} className={`col-day ${isToday ? "is-today" : ""}`}>
+                                {cell?.AM && <div className="matrix-bath-badge am">朝</div>}
+                                {cell?.PM && <div className="matrix-bath-badge pm">午</div>}
+                                {!cell?.AM && !cell?.PM && <span className="matrix-empty">—</span>}
+                              </td>
+                            );
+                          })}
+                          <td className="col-day">
+                            <span className={`matrix-week-total ${totalCls}`}>
+                              {total === 0 && <span className="warn-triangle" />}
+                              {total}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
               </tbody>
               <tfoot>
                 <tr>

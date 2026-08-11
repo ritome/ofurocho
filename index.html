@@ -349,6 +349,16 @@
     .badge-skin { background: #fff4e5; color: #b26b00; border: 1px solid #f0c98a; font-size: 11px; padding: 3px 9px; border-radius: 999px; font-weight: 600; }
     .res-row-undo { font-size: 11px; color: #2e9e5b; text-decoration: underline; background: none; border: none; cursor: pointer; margin-right: 8px; }
     .res-row-skipbtn { font-size: 11px; color: #6b7280; background: #fff; border: 1px solid #cbd5e1; border-radius: 999px; padding: 3px 10px; cursor: pointer; margin-right: 8px; }
+    .res-row.is-warn .res-row-gbar { background: #d9534f; }
+    .res-row--edit.is-planned { background: #f6fbf7; }
+    .res-row-last { font-size: 12px; color: #64748b; white-space: nowrap; }
+    .res-row-last.is-attention { color: #b26b00; }
+    .res-row-last.is-critical { color: #b02a1f; font-weight: 600; }
+    .res-row-plan { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 3px 10px; margin-right: 8px; white-space: nowrap; }
+    .res-row-plan.am { background: #2e9e5b; color: #fff; }
+    .res-row-plan.pm { background: #1f7a45; color: #fff; }
+    .res-row-plan.bathed { background: #eef1f5; color: #556; }
+    .res-row-plan.add { background: #fff; color: #6b7280; border: 1px dashed #cbd5e1; }
 
     @media (min-width: 900px) {
       .res-group-rows {
@@ -3424,6 +3434,25 @@
       return groups;
     };
 
+    // ユニット別にグループ化（入力順を保持。未設定は「その他」で末尾）。
+    // getResident: 各要素から resident を取り出す関数。
+    const groupResidentsByUnit = (rows, getResident) => {
+      const map = new Map();
+      rows.forEach((row) => {
+        const r = getResident(row);
+        const unit = ((r && r.ユニット) || "").trim() || "その他";
+        if (!map.has(unit)) map.set(unit, []);
+        map.get(unit).push(row);
+      });
+      const groups = [...map.entries()].map(([unit, list]) => ({ unit, rows: list }));
+      groups.sort((a, b) => {
+        if (a.unit === "その他") return 1;
+        if (b.unit === "その他") return -1;
+        return a.unit.localeCompare(b.unit, "ja");
+      });
+      return groups;
+    };
+
     function ResidentRow({ resident, plan, weekCount, goal, onToggle, onOpenMenu }) {
       const isDone = plan.状態 === "済";
       const isUnimplemented = plan.状態 === "未実施";
@@ -3468,6 +3497,46 @@
             <button type="button" className="res-row-skipbtn"
               onClick={(e) => { e.stopPropagation(); onOpenMenu(); }}>未実施</button>
           )}
+        </div>
+      );
+    }
+
+    function EditRow({ resident, planSession, isBathedToday, lastDays, level, onTap }) {
+      const sexCls = resident.性別 === "男" ? "is-male" : resident.性別 === "女" ? "is-female" : "";
+      const isWarn = level === "attention" || level === "critical";
+      const rowCls = [
+        "res-row", "res-row--edit",
+        planSession && "is-planned",
+        isWarn && "is-warn",
+        sexCls,
+      ].filter(Boolean).join(" ");
+
+      const lastLabel = (() => {
+        if (lastDays == null) return "未浴";
+        if (lastDays === 0) return "本日";
+        if (lastDays === 1) return "昨日";
+        return `${lastDays}日前`;
+      })();
+
+      const lastCls = [
+        "res-row-last",
+        level === "critical" && "is-critical",
+        level === "attention" && "is-attention",
+      ].filter(Boolean).join(" ");
+
+      return (
+        <div className={rowCls} onClick={() => onTap(resident.id)} role="button" tabIndex={0}
+             aria-label={`${resident.名前} ${planSession ? "予定あり" : "予定なし"}`}>
+          <span className="res-row-gbar" />
+          <span className="res-row-name">{resident.名前}</span>
+          {resident.区分 === "短期" && <span className="res-row-short">短期</span>}
+          <span className={lastCls}>最終 {lastLabel}</span>
+          <span className="res-row-spacer" />
+          {resident.皮膚評価要 && <span className="badge-skin">皮膚</span>}
+          {planSession === "AM" && <span className="res-row-plan am">午前</span>}
+          {planSession === "PM" && <span className="res-row-plan pm">午後</span>}
+          {!planSession && isBathedToday && <span className="res-row-plan bathed">本日入浴</span>}
+          {!planSession && !isBathedToday && <span className="res-row-plan add">＋予定</span>}
         </div>
       );
     }
@@ -6360,18 +6429,31 @@
                 body="フィルタや検索を見直してください。"
               />
             ) : (
-              <div className="card-grid">
-                {sorted.map(item => (
-                  <EditCard
-                    key={item.resident.id}
-                    resident={item.resident}
-                    planSession={item.planSession}
-                    isBathedToday={item.isBathedToday}
-                    lastDays={item.lastDays}
-                    level={item.level}
-                    onTap={handleTap}
-                  />
-                ))}
+              <div className="res-list">
+                {groupResidentsByUnit(sorted, (x) => x.resident).map(g => {
+                  const plannedCount = g.rows.filter(x => x.planSession).length;
+                  return (
+                    <div className="res-group" key={g.unit}>
+                      <div className="res-group-head">
+                        <span className="res-group-title">{g.unit}</span>
+                        <span className="res-group-count">{plannedCount}名予定</span>
+                      </div>
+                      <div className="res-group-rows">
+                        {g.rows.map(item => (
+                          <EditRow
+                            key={item.resident.id}
+                            resident={item.resident}
+                            planSession={item.planSession}
+                            isBathedToday={item.isBathedToday}
+                            lastDays={item.lastDays}
+                            level={item.level}
+                            onTap={handleTap}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
             <div className="edit-footer">

@@ -2274,6 +2274,21 @@
       color: #2d2820;
     }
 
+    .skin-print-overlay { position: fixed; inset: 0; background: #f6f7f9; overflow: auto; z-index: 4000; padding: 16px; }
+    .skin-print-toolbar { display: flex; justify-content: flex-end; gap: 10px; max-width: 720px; margin: 0 auto 12px; }
+    .skin-print-sheet { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px 22px; max-width: 720px; margin: 0 auto; color: #1f2937; }
+    .skin-print-head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #374151; padding-bottom: 8px; margin-bottom: 14px; }
+    .skin-print-title { font-size: 18px; font-weight: 700; }
+    .skin-print-meta { font-size: 12px; color: #64748b; }
+    .skin-print-doc { margin-bottom: 18px; }
+    .skin-print-docname { font-size: 15px; font-weight: 700; color: #374151; background: #f1f5f9; border-left: 5px solid #64748b; padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; }
+    .skin-print-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .skin-print-table th, .skin-print-table td { border: 1px solid #d7dbe0; padding: 8px 9px; text-align: left; }
+    .skin-print-table th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; }
+    .skin-print-table td { height: 30px; }
+    .skin-print-name { font-weight: 600; font-size: 15px; }
+    .skin-print-empty { color: #64748b; }
+
     /* ============================================================
        @media print
        ============================================================ */
@@ -2374,6 +2389,12 @@
       .placeholder, .edit-footer {
         display: none !important;
       }
+    }
+
+    @media print {
+      body.skin-printing .app > :not(.skin-print-overlay) { display: none !important; }
+      body.skin-printing .skin-print-overlay { position: static; padding: 0; background: #fff; }
+      body.skin-printing .skin-print-sheet { border: none; max-width: none; margin: 0; }
     }
   </style>
 </head>
@@ -5719,6 +5740,64 @@
       );
     }
 
+    function SkinAssessmentPrintView({ residents, onClose }) {
+      const targets = residents.filter(r => r.在籍中 && r.皮膚評価要);
+      const byDoctor = new Map();
+      targets.forEach(r => {
+        const d = (r.主治医 || "").trim() || "（主治医未設定）";
+        if (!byDoctor.has(d)) byDoctor.set(d, []);
+        byDoctor.get(d).push(r);
+      });
+      const doctors = [...byDoctor.entries()]
+        .map(([doctor, list]) => ({
+          doctor,
+          list: list.slice().sort((a, b) =>
+            (a.部屋番号 || "").localeCompare(b.部屋番号 || "", "ja", { numeric: true })),
+        }))
+        .sort((a, b) => a.doctor.localeCompare(b.doctor, "ja"));
+
+      useEffect(() => {
+        document.body.classList.add("skin-printing");
+        return () => document.body.classList.remove("skin-printing");
+      }, []);
+
+      return (
+        <div className="skin-print-overlay">
+          <div className="skin-print-toolbar no-print">
+            <button type="button" className="btn btn-ghost" onClick={onClose}>閉じる</button>
+            <button type="button" className="btn btn-primary" onClick={() => window.print()}>🖨 印刷</button>
+          </div>
+          <div className="skin-print-sheet">
+            <div className="skin-print-head">
+              <div className="skin-print-title">皮膚評価一覧</div>
+              <div className="skin-print-meta">作成日 {new Date().toLocaleDateString("ja-JP")}　対象 {targets.length}名</div>
+            </div>
+            {doctors.length === 0 ? (
+              <p className="skin-print-empty">「皮膚評価が必要」に設定された利用者がいません。</p>
+            ) : doctors.map(({ doctor, list }) => (
+              <div className="skin-print-doc" key={doctor}>
+                <div className="skin-print-docname">主治医：{doctor}</div>
+                <table className="skin-print-table">
+                  <thead>
+                    <tr><th>部屋</th><th>氏名</th><th>所見（記入欄）</th></tr>
+                  </thead>
+                  <tbody>
+                    {list.map(r => (
+                      <tr key={r.id}>
+                        <td>{r.ユニット || r.部屋番号}</td>
+                        <td className="skin-print-name">{r.名前}</td>
+                        <td></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     function AboutSection({ settings, onClearAll }) {
       const handleClear = () => {
         if (!window.confirm("全データを削除します。よろしいですか？\n（この操作は取り消せません）")) return;
@@ -5768,6 +5847,7 @@
       onAddStaff,
       onEditStaff,
       onDeleteStaff,
+      onOpenSkinPrint,
     }) {
       return (
         <div>
@@ -5792,6 +5872,11 @@
             residents={data.residents}
             onOpenList={onOpenResidentList}
           />
+          <div className="data-card">
+            <h3 className="data-card-title">🩹 皮膚評価一覧（主治医別）</h3>
+            <p className="data-card-desc">皮膚評価が必要な利用者を主治医別にまとめて印刷します。</p>
+            <button type="button" className="btn btn-primary" onClick={onOpenSkinPrint}>一覧を開く／印刷</button>
+          </div>
           <AboutSection
             settings={data.settings}
             onClearAll={onClearAll}
@@ -6581,6 +6666,7 @@
         });
       }, []);
 
+      const [skinPrintOpen, setSkinPrintOpen] = useState(false);
       const [residentListOpen, setResidentListOpen] = useState(false);
       const [residentEditTarget, setResidentEditTarget] = useState(null);
       const residentEditOpen = residentEditTarget !== null;
@@ -6725,6 +6811,7 @@
                 onAddStaff={handleAddStaff}
                 onEditStaff={handleEditStaff}
                 onDeleteStaff={handleDeleteStaff}
+                onOpenSkinPrint={() => setSkinPrintOpen(true)}
               />
             );
           default:
@@ -6832,6 +6919,9 @@
             target={staffEditTarget || null}
             onSave={handleSaveStaff}
           />
+          {skinPrintOpen && (
+            <SkinAssessmentPrintView residents={data.residents} onClose={() => setSkinPrintOpen(false)} />
+          )}
         </div>
       );
     }

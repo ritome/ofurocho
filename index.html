@@ -2290,6 +2290,7 @@
     .print-schedule-table td.col-no,
     .print-schedule-table td.col-room,
     .print-schedule-table td.col-class,
+    .print-schedule-table td.col-skin,
     .print-schedule-table td.col-check {
       text-align: center;
     }
@@ -2302,6 +2303,7 @@
     .print-schedule-table td.col-no { width: 32px; }
     .print-schedule-table td.col-room { min-width: 56px; white-space: nowrap; }
     .print-schedule-table td.col-class { width: 48px; }
+    .print-schedule-table td.col-skin { width: 40px; font-weight: 500; }
 
     .print-footer {
       display: flex;
@@ -6107,19 +6109,21 @@
                 <th className="col-room">部屋</th>
                 <th>利用者名</th>
                 <th className="col-class">区分</th>
+                <th className="col-skin">皮膚</th>
                 <th className="col-check">入浴</th>
                 <th>備考</th>
               </tr>
             </thead>
             <tbody>
               {filteredPlans.length === 0 ? (
-                <tr><td colSpan={6} style={{ textAlign: "center" }}>予定なし</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: "center" }}>予定なし</td></tr>
               ) : filteredPlans.map(({ plan, resident }, i) => (
                 <tr key={plan.id}>
                   <td className="col-no">{i + 1}</td>
                   <td className="col-room">{resident.部屋番号}</td>
                   <td>{resident.名前}</td>
                   <td className="col-class">{resident.区分}</td>
+                  <td className="col-skin">{resident.皮膚評価要 ? "要" : ""}</td>
                   <td className="col-check">□</td>
                   <td>&nbsp;</td>
                 </tr>

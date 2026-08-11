@@ -1,7 +1,7 @@
 // sw.js - お風呂帖サービスワーカー
 // オフラインでも動作するよう、初回読み込み時にアプリ本体をキャッシュ
 
-const CACHE_NAME = 'ofurocho-v6';
+const CACHE_NAME = 'ofurocho-v7';
 const ASSETS = [
   './',
   './index.html',

@@ -2808,7 +2808,7 @@
       });
     };
 
-    const UNIMPLEMENTED_REASONS = ["時間切れ", "体調不良", "通院", "入院中", "その他"];
+    const UNIMPLEMENTED_REASONS = ["時間が足りなかった", "本人の希望で見送り", "体調不良", "受診・外出", "拒否", "その他"];
 
     /* ============================================================
        体制（sessionTeams）関連
@@ -3452,17 +3452,17 @@
     }
 
     function UnimplementedModal({ open, onClose, target, onSave }) {
-      const [reason, setReason] = useState("時間切れ");
+      const [reason, setReason] = useState("時間が足りなかった");
       const [memo, setMemo] = useState("");
 
       useEffect(() => {
         if (!open || !target) return;
         // 既に未実施記録がある場合は既存値を初期化
         if (target.plan.状態 === "未実施") {
-          setReason(target.plan.未実施理由 || "時間切れ");
+          setReason(target.plan.未実施理由 || "時間が足りなかった");
           setMemo(target.plan.メモ || "");
         } else {
-          setReason("時間切れ");
+          setReason("時間が足りなかった");
           setMemo("");
         }
       }, [open, target]);

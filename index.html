@@ -321,6 +321,35 @@
       .card-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
+    .res-list { display: flex; flex-direction: column; gap: 16px; }
+    .res-group-head { display: flex; align-items: center; gap: 10px; margin: 4px 0 6px; }
+    .res-group-title { font-size: 14px; font-weight: 600; color: #374151; border-left: 4px solid #64748b; padding-left: 8px; }
+    .res-group-count { font-size: 12px; color: #64748b; white-space: nowrap; }
+    .res-group-bar { flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; max-width: 200px; }
+    .res-group-bar > i { display: block; height: 100%; background: #2e9e5b; }
+    .res-group-rows { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #fff; }
+
+    .res-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 0;
+      border-bottom: 1px solid #f1f5f9; position: relative; cursor: pointer; min-height: 44px; }
+    .res-row:last-child { border-bottom: none; }
+    .res-row-gbar { width: 7px; align-self: stretch; background: #cbd5e1; border-radius: 0 3px 3px 0; }
+    .res-row.is-male .res-row-gbar { background: #9cc0f5; }
+    .res-row.is-female .res-row-gbar { background: #c3a9ef; }
+    .res-row-name { font-size: 19px; font-weight: 600; color: #1f2937; min-width: 112px; }
+    .res-row-short { font-size: 11px; color: #7a5; border: 1px solid #cbe0c0; border-radius: 999px; padding: 1px 7px; }
+    .res-row-time { font-size: 12px; color: #8a8a8a; }
+    .res-row-spacer { flex: 1; }
+    .res-row-skiptag { font-size: 11px; background: #eef1f5; color: #556; padding: 3px 9px; border-radius: 999px; }
+    .res-row-week { font-size: 12px; color: #475569; background: #eef2f7; border-radius: 999px; padding: 3px 9px; font-weight: 600; white-space: nowrap; }
+    .res-row-week.is-behind { color: #b02a1f; background: #fdeceb; }
+    .res-row.is-done { background: #f6fbf7; }
+    .res-row.is-skip { background: #fafafa; }
+    .res-row.is-skip .res-row-gbar { background: #cbd5e1; }
+    .chk-done { background: #2e9e5b; color: #fff; font-size: 12px; padding: 3px 10px; border-radius: 999px; font-weight: 600; }
+    .badge-skin { background: #fff4e5; color: #b26b00; border: 1px solid #f0c98a; font-size: 11px; padding: 3px 9px; border-radius: 999px; font-weight: 600; }
+    .res-row-undo { font-size: 11px; color: #2e9e5b; text-decoration: underline; background: none; border: none; cursor: pointer; margin-right: 8px; }
+    .res-row-skipbtn { font-size: 11px; color: #6b7280; background: #fff; border: 1px solid #cbd5e1; border-radius: 999px; padding: 3px 10px; cursor: pointer; margin-right: 8px; }
+
     /* 利用者カード */
     .resident-card {
       position: relative;
@@ -3343,6 +3372,76 @@
       );
     }
 
+    const groupByUnit = (items) => {
+      const map = new Map();
+      items.forEach(({ plan, resident }) => {
+        const unit = (resident.ユニット || "").trim() || "その他";
+        if (!map.has(unit)) map.set(unit, []);
+        map.get(unit).push({ plan, resident });
+      });
+      const groups = [...map.entries()].map(([unit, rows]) => ({
+        unit,
+        rows: rows.slice().sort((a, b) =>
+          (a.resident.部屋番号 || "").localeCompare(b.resident.部屋番号 || "", "ja", { numeric: true })),
+        doneCount: rows.filter(r => r.plan.状態 === "済").length,
+        total: rows.length,
+      }));
+      groups.sort((a, b) => {
+        if (a.unit === "その他") return 1;
+        if (b.unit === "その他") return -1;
+        return a.unit.localeCompare(b.unit, "ja");
+      });
+      return groups;
+    };
+
+    function ResidentRow({ resident, plan, weekCount, goal, onToggle, onOpenMenu }) {
+      const isDone = plan.状態 === "済";
+      const isUnimplemented = plan.状態 === "未実施";
+      const sexCls = resident.性別 === "男" ? "is-male" : resident.性別 === "女" ? "is-female" : "";
+      const behind = goal > 0 && weekCount < goal; // 週目標に未達
+
+      const rowCls = [
+        "res-row",
+        isDone && "is-done",
+        isUnimplemented && "is-skip",
+        (!isDone && !isUnimplemented) && sexCls,
+      ].filter(Boolean).join(" ");
+
+      const handleRowClick = () => {
+        if (isDone || isUnimplemented) return; // 戻すのは「取消」ボタンだけ（誤操作防止）
+        onToggle(plan.id);
+      };
+
+      return (
+        <div className={rowCls} onClick={handleRowClick} role="button" tabIndex={0}
+             aria-label={`${resident.名前} ${isDone ? "済" : isUnimplemented ? "未実施" : "予定"}`}>
+          <span className="res-row-gbar" />
+          <span className="res-row-name">{resident.名前}</span>
+          {resident.区分 === "短期" && <span className="res-row-short">短期</span>}
+          <span className="res-row-time">
+            {isDone && plan.記録時刻 ? new Date(plan.記録時刻).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }) : ""}
+          </span>
+          <span className="res-row-spacer" />
+          <span className={`res-row-week${behind ? " is-behind" : ""}`}>今週 {weekCount}/{goal}</span>
+          {resident.皮膚評価要 && <span className="badge-skin">皮膚</span>}
+          {isUnimplemented && (
+            <span className="res-row-skiptag">
+              未実施・{plan.未実施理由 === "その他" && plan.メモ ? plan.メモ : (plan.未実施理由 || "")}
+            </span>
+          )}
+          {isDone && <span className="chk-done">✓ 済</span>}
+          {(isDone || isUnimplemented) && (
+            <button type="button" className="res-row-undo"
+              onClick={(e) => { e.stopPropagation(); onToggle(plan.id); }}>取消</button>
+          )}
+          {(!isDone && !isUnimplemented) && (
+            <button type="button" className="res-row-skipbtn"
+              onClick={(e) => { e.stopPropagation(); onOpenMenu(); }}>未実施</button>
+          )}
+        </div>
+      );
+    }
+
     function UnimplementedModal({ open, onClose, target, onSave }) {
       const [reason, setReason] = useState("時間切れ");
       const [memo, setMemo] = useState("");
@@ -6193,6 +6292,15 @@
     function RecordTab({ data, today, session, onChangeSession, onTogglePlan, onOpenMenu, onOpenTeam, onEnterEdit }) {
       const dateStr = ymd(today);
 
+      const weekAgg = useMemo(() => {
+        const ws = startOfWeek(today);
+        const days = weekDays(ws);
+        return aggregateBathByResident(data.bathPlans, ymd(days[0]), ymd(days[days.length - 1]));
+      }, [data.bathPlans, today]);
+      const defaultGoal = data.settings.入浴目標.週 || 2;
+      const goalFor = (r) => (r.個別目標 && r.個別目標.週) ? r.個別目標.週 : defaultGoal;
+      const weekCountFor = (r) => (weekAgg.get(r.id) || []).length;
+
       const amItems = useMemo(
         () => selectTodayPlans(data.bathPlans, data.residents, dateStr, "AM"),
         [data.bathPlans, data.residents, dateStr]
@@ -6232,15 +6340,28 @@
           ) : (
             <>
               <ProgressBar doneCount={doneCount} totalCount={items.length} />
-              <div className="card-grid">
-                {items.map(({ plan, resident }) => (
-                  <ResidentCard
-                    key={plan.id}
-                    resident={resident}
-                    plan={plan}
-                    onToggle={onTogglePlan}
-                    onOpenMenu={() => onOpenMenu({ plan, resident })}
-                  />
+              <div className="res-list">
+                {groupByUnit(items).map(g => (
+                  <div className="res-group" key={g.unit}>
+                    <div className="res-group-head">
+                      <span className="res-group-title">{g.unit}</span>
+                      <span className="res-group-count">{g.doneCount} / {g.total} 済</span>
+                      <span className="res-group-bar"><i style={{ width: `${g.total ? Math.round(g.doneCount / g.total * 100) : 0}%` }} /></span>
+                    </div>
+                    <div className="res-group-rows">
+                      {g.rows.map(({ plan, resident }) => (
+                        <ResidentRow
+                          key={plan.id}
+                          resident={resident}
+                          plan={plan}
+                          weekCount={weekCountFor(resident)}
+                          goal={goalFor(resident)}
+                          onToggle={onTogglePlan}
+                          onOpenMenu={() => onOpenMenu({ plan, resident })}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </>

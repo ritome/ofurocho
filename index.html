@@ -5316,10 +5316,10 @@
       const [customWeek, setCustomWeek] = useState(2);
       const [excluded, setExcluded] = useState(false);
       const [excludeReason, setExcludeReason] = useState("");
-      const [sex, setSex] = useState(target.性別 || "");
-      const [unit, setUnit] = useState(target.ユニット || "");
-      const [skinCheck, setSkinCheck] = useState(!!target.皮膚評価要);
-      const [doctor, setDoctor] = useState(target.主治医 || "");
+      const [sex, setSex] = useState("");
+      const [unit, setUnit] = useState("");
+      const [skinCheck, setSkinCheck] = useState(false);
+      const [doctor, setDoctor] = useState("");
 
       useEffect(() => {
         if (!open || !target) return;
@@ -5332,6 +5332,10 @@
         }
         setExcluded(!!target.目標除外);
         setExcludeReason(target.目標除外理由 || "");
+        setSex(target.性別 || "");
+        setUnit(target.ユニット || "");
+        setSkinCheck(!!target.皮膚評価要);
+        setDoctor(target.主治医 || "");
       }, [open, target, defaultGoalPerWeek]);
 
       if (!target) return null;

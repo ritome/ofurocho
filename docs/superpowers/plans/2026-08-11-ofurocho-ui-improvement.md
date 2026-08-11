@@ -28,9 +28,13 @@
 
 純粋ロジック（`normalizeResident` 等）は、ブラウザの devtools コンソールで関数を直接呼んで戻り値を確認する（後述の各タスクに具体コマンドを記載）。
 
-## 未解決の前提（要ユーザー確認）
+## 確定した前提（ユーザー承認済み 2026-08-11）
 
-- **性別（`性別`）フィールドの追加**: 仕様書§4は行を男女で色分けするが、既存データモデルに性別が無い。本計画では resident に `性別`（`"男"|"女"|""`, 初期値 `""`）を追加し、Excel「性別」列取り込み＋編集モーダルで入力可、`""` は色帯なし（中立グレー）とする前提で実装する。取り込み元や既定の扱いが違う場合はここを差し替える。
+- **試行の目的**: 49名＋短期入所者が **週2回**（将来は週3回に切替）入浴できるよう管理する。よって日次画面の主役情報は「今週あと何回必要か／週目標に未達の人は誰か」。
+- **性別（`性別`）フィールドの追加**: 仕様書§4は行を男女で色分けするが既存データモデルに性別が無い → resident に `性別`（`"男"|"女"|""`, 初期値 `""`）を追加。Excel「性別」列取り込み＋編集モーダルで入力可、`""` は色帯なし（中立グレー）。
+- **週回数インジケータ（②）**: 各行に「今週 N/目標」を表示し、**未達（N<目標）を赤系で強調**。目標は固定値ではなく `個別目標.週 ?? settings.入浴目標.週` を参照（設定で週2⇔週3を切替可能、即時反映）。既存の週集計 `aggregateBathByResident` を使う。
+- **既定の入浴目標**: 試行のため `DEFAULTS.settings.入浴目標.週` を **2** にする（設定画面でいつでも変更可）。
+- **「N日未浴」バッジ**: モックにある前回入浴日ベースの日数バッジは v1 では出さず、上記「今週 N/目標」で代替する。
 
 ---
 
@@ -122,7 +126,15 @@ const normalizeResident = (r) => ({
   })).filter(r => r.名前);
 ```
 
-- [ ] **Step 3: 互換ロード確認（コンソール）**
+- [ ] **Step 3: 既定の入浴目標を週2回にする**
+
+`index.html` 2381行の `入浴目標: { 週: 3, 最低: 2 },` を次に変更（試行の既定。設定画面で変更可）:
+
+```javascript
+        入浴目標: { 週: 2, 最低: 2 },
+```
+
+- [ ] **Step 4: 互換ロード確認（コンソール）**
 
 `http://localhost:8080/?dev=1&cb=2` を開き DevBar でサンプル投入。devtools コンソールで:
 
@@ -138,11 +150,11 @@ JSON.parse(localStorage.getItem("ofurocho.residents"))
 ```
 Expected: `性別:""`, `ユニット:""`, `皮膚評価要:false`, `主治医:""` が入り、`名前:"旧太郎"` が保持される。エラー無し。
 
-- [ ] **Step 4: コミット**
+- [ ] **Step 5: コミット**
 
 ```bash
 git add index.html
-git commit -m "feat: residentに性別・ユニット・皮膚評価要・主治医を初期値つきで追加(Excel取り込み対応)"
+git commit -m "feat: residentに性別・ユニット・皮膚評価要・主治医を初期値つきで追加(Excel取り込み対応)＋既定目標を週2回に"
 ```
 
 ---
@@ -307,7 +319,7 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
 - Consumes: Task 2/3 の resident 新フィールド。`selectTodayPlans`（2719行）が返す `{plan, resident}` 配列。`onTogglePlan`（済にする）、`onOpenMenu`（未実施メニュー）。
 - Produces:
   - `groupByUnit(items) -> Array<{unit: string, rows: Array<{plan, resident}>, doneCount: number, total: number}>`（ユニット名昇順、未設定は「その他」を最後）。
-  - `ResidentRow({ resident, plan, onToggle, onOpenMenu })` — 1名1行を描画。
+  - `ResidentRow({ resident, plan, weekCount, goal, onToggle, onOpenMenu })` — 1名1行を描画。`weekCount`=今週の入浴済回数、`goal`=週目標回数。`weekCount < goal` を赤系で強調。
 
 - [ ] **Step 1: グループ化ヘルパ `groupByUnit` を追加**
 
@@ -342,11 +354,11 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
 `groupByUnit` の直後に追加:
 
 ```javascript
-    function ResidentRow({ resident, plan, onToggle, onOpenMenu }) {
+    function ResidentRow({ resident, plan, weekCount, goal, onToggle, onOpenMenu }) {
       const isDone = plan.状態 === "済";
       const isUnimplemented = plan.状態 === "未実施";
       const sexCls = resident.性別 === "男" ? "is-male" : resident.性別 === "女" ? "is-female" : "";
-      const daysBadge = null; // 未浴日数は既存集計に無いため v1 では区分ベースのみ
+      const behind = goal > 0 && weekCount < goal; // 週目標に未達
 
       const rowCls = [
         "res-row",
@@ -370,6 +382,7 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
             {isDone && plan.記録時刻 ? new Date(plan.記録時刻).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }) : ""}
           </span>
           <span className="res-row-spacer" />
+          <span className={`res-row-week${behind ? " is-behind" : ""}`}>今週 {weekCount}/{goal}</span>
           {resident.皮膚評価要 && <span className="badge-skin">皮膚</span>}
           {isUnimplemented && (
             <span className="res-row-skiptag">
@@ -392,7 +405,22 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
 
 注: 「取消」は `onToggle(plan.id)` を呼ぶ（`togglePlanStatus` は 済→予定 / 未実施→予定 に戻すため）。行本体クリックでは戻さない。
 
-- [ ] **Step 3: `RecordTab` の描画を行リストに差し替え**
+- [ ] **Step 3a: `RecordTab` に今週の入浴回数集計を追加**
+
+`RecordTab`（6136-6199行）の冒頭、`const dateStr = ymd(today);` の直後に、今週の週目標と入浴回数マップを計算する `useMemo` を追加する:
+
+```javascript
+      const weekAgg = useMemo(() => {
+        const ws = startOfWeek(today);
+        const days = weekDays(ws);
+        return aggregateBathByResident(data.bathPlans, ymd(days[0]), ymd(days[days.length - 1]));
+      }, [data.bathPlans, today]);
+      const defaultGoal = data.settings.入浴目標.週 || 2;
+      const goalFor = (r) => (r.個別目標 && r.個別目標.週) ? r.個別目標.週 : defaultGoal;
+      const weekCountFor = (r) => (weekAgg.get(r.id) || []).length;
+```
+
+- [ ] **Step 3b: `RecordTab` の描画を行リストに差し替え**
 
 `RecordTab`（6136-6199行）内の `<div className="card-grid"> ... </div>` ブロック全体を次に置き換える:
 
@@ -411,6 +439,8 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
                       key={plan.id}
                       resident={resident}
                       plan={plan}
+                      weekCount={weekCountFor(resident)}
+                      goal={goalFor(resident)}
                       onToggle={onTogglePlan}
                       onOpenMenu={() => onOpenMenu({ plan, resident })}
                     />
@@ -420,6 +450,8 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
             ))}
           </div>
 ```
+
+注: `startOfWeek`/`weekDays`/`aggregateBathByResident`/`ymd` はいずれもモジュール上部（2932/2964/3006行）で定義済みで、同スコープから参照できる。
 
 - [ ] **Step 4: 行リストCSSを追加**
 
@@ -445,6 +477,8 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
 .res-row-time { font-size: 12px; color: #8a8a8a; }
 .res-row-spacer { flex: 1; }
 .res-row-skiptag { font-size: 11px; background: #eef1f5; color: #556; padding: 3px 9px; border-radius: 999px; }
+.res-row-week { font-size: 12px; color: #475569; background: #eef2f7; border-radius: 999px; padding: 3px 9px; font-weight: 600; white-space: nowrap; }
+.res-row-week.is-behind { color: #b02a1f; background: #fdeceb; }
 .res-row.is-done { background: #f6fbf7; }
 .res-row.is-skip { background: #fafafa; }
 .res-row.is-skip .res-row-gbar { background: #cbd5e1; }
@@ -457,7 +491,7 @@ git commit -m "fix: 未バックアップ時に41666日と誤表示する不具�
 - [ ] **Step 5: ブラウザで確認**
 
 `?dev=1&cb=5` を開きサンプル投入。編集タブでサンプル利用者に `性別`/`ユニット` を数名分入力（またはExcel取り込み）。入浴記録タブを開く。
-Expected: 利用者がユニット別グループで縦の行リスト表示になる。各グループ見出しに「N / M 済」＋バー。男=青帯/女=紫帯/未設定=グレー帯。行タップで「✓ 済」＋緑背景になり、「取消」ボタンが出る。皮膚評価ONの人にオレンジ「皮膚」バッジ。コンソールエラー0件。
+Expected: 利用者がユニット別グループで縦の行リスト表示になる。各グループ見出しに「N / M 済」＋バー。男=青帯/女=紫帯/未設定=グレー帯。各行に「今週 N/2」が出て、未達の人は赤系で強調。行タップで「✓ 済」＋緑背景になり、「取消」ボタンが出る（このとき今週回数が+1される）。皮膚評価ONの人にオレンジ「皮膚」バッジ。コンソールエラー0件。
 
 - [ ] **Step 6: コミット**
 
@@ -719,5 +753,5 @@ Expected: いずれもコンソールエラー0件、レイアウト崩れ無し
 ## Self-Review 結果
 
 - **Spec coverage:** §2の9項目 → Task1(描画復旧), Task4(41666バグ), Task5(一覧刷新), Task5(ユニット別グループ), Task5+7(操作フロー), Task5(見た目), Task5(皮膚バッジ), Task8(主治医別印刷), 既存Excel/JSON機能は現状維持+Task9で互換確認。§3のデータモデル→Task2/3。§4レイアウト→Task5/6。§5フロー→Task5/7。§6皮膚→Task3/5/8。§7バグ→Task1/4。
-- **Gap（明示）:** 仕様書§4の男女色分けに必要な `性別` フィールドが元仕様§3に無い → Task2で追加し前提として明記。ユーザー確認事項に記載。
-- **未浴「N日未浴」バッジ:** 既存データに前回入浴日の集計が日次画面に無いため、v1では区分/性別/皮膚/済のみ表示とし、未浴日数バッジは対象外（仕様のモックにはあるが、算出は達成率集計側。必要ならv2で行に追加）。この差分をユーザーに要確認。
+- **Gap（解決済み）:** 仕様書§4の男女色分けに必要な `性別` フィールドが元仕様§3に無い → Task2で追加（ユーザー承認済み）。
+- **週回数インジケータ（②・ユーザー承認済み）:** 試行目的「週2回入浴」に合わせ、各行に「今週 N/目標」を表示し未達を強調（Task5）。目標は `個別目標.週 ?? settings.入浴目標.週` を参照し、週2⇔週3の切替は設定変更で即時反映。既定目標は週2（Task2 Step3）。「N日未浴」バッジはこれで代替し v1 では出さない。

@@ -4321,42 +4321,49 @@
               <tbody>
                 {rows.length === 0 ? (
                   <tr><td colSpan={4} className="matrix-empty">該当する利用者がいません</td></tr>
-                ) : rows.map(row => {
-                  const isExcluded = row.level === "excluded";
-                  const widthPct = isExcluded ? 0 : Math.min(100, row.percent);
-                  return (
-                    <tr key={row.resident.id}>
-                      <td className="col-room">{row.resident.部屋番号}</td>
-                      <td className="col-name">
-                        {row.resident.区分 === "短期" && <span className="short-mark">短</span>}
-                        {isExcluded && <span className="excluded-mark">除外</span>}
-                        {row.resident.名前}
-                      </td>
-                      <td className="col-count">{row.count} 回</td>
-                      <td className="col-bar">
-                        {isExcluded ? (
-                          <div className="achievement-bar-row">
-                            <span className="achievement-excluded">目標除外{row.resident.目標除外理由 ? `（${row.resident.目標除外理由}）` : ""}</span>
-                          </div>
-                        ) : (
-                          <div className="achievement-bar-row">
-                            <div className="achievement-bar-track">
-                              <div
-                                className={`achievement-bar-fill lv-${row.level}`}
-                                style={{ width: `${widthPct}%` }}
-                              />
-                            </div>
-                            <div className={`achievement-percent lv-${row.level}`}>
-                              {row.level === "good" && <span className="check-mark">✓</span>}
-                              {(row.level === "attention" || row.level === "warn") && <span className="warn-triangle" />}
-                              {row.percent}%
-                            </div>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                ) : groupResidentsByUnit(rows, (x) => x.resident).map(g => (
+                  <React.Fragment key={g.unit}>
+                    <MatrixGroupRow unit={g.unit} colSpan={4} />
+                    {g.rows.map(row => {
+                      const isExcluded = row.level === "excluded";
+                      const widthPct = isExcluded ? 0 : Math.min(100, row.percent);
+                      return (
+                        <tr key={row.resident.id}>
+                          <td className="col-room">{row.resident.部屋番号}</td>
+                          <td className="col-name">
+                            <UnitDot resident={row.resident} />
+                            {row.resident.区分 === "短期" && <span className="short-mark">短</span>}
+                            {isExcluded && <span className="excluded-mark">除外</span>}
+                            {row.resident.名前}
+                            {row.resident.皮膚評価要 && <span className="skin-mark">皮</span>}
+                          </td>
+                          <td className="col-count">{row.count} 回</td>
+                          <td className="col-bar">
+                            {isExcluded ? (
+                              <div className="achievement-bar-row">
+                                <span className="achievement-excluded">目標除外{row.resident.目標除外理由 ? `（${row.resident.目標除外理由}）` : ""}</span>
+                              </div>
+                            ) : (
+                              <div className="achievement-bar-row">
+                                <div className="achievement-bar-track">
+                                  <div
+                                    className={`achievement-bar-fill lv-${row.level}`}
+                                    style={{ width: `${widthPct}%` }}
+                                  />
+                                </div>
+                                <div className={`achievement-percent lv-${row.level}`}>
+                                  {row.level === "good" && <span className="check-mark">✓</span>}
+                                  {(row.level === "attention" || row.level === "warn") && <span className="warn-triangle" />}
+                                  {row.percent}%
+                                </div>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
               </tbody>
             </table>
           </div>
@@ -4442,26 +4449,33 @@
               <tbody>
                 {filtered.length === 0 ? (
                   <tr><td colSpan={months.length + 3} className="matrix-empty">該当する利用者がいません</td></tr>
-                ) : filtered.map(row => (
-                  <tr key={row.resident.id}>
-                    <td className="col-room">{row.resident.部屋番号}</td>
-                    <td className="col-name">
-                      {row.resident.区分 === "短期" && <span className="short-mark">短</span>}
-                      {row.level === "excluded" && <span className="excluded-mark">除外</span>}
-                      {row.resident.名前}
-                    </td>
-                    {row.monthly.map((m, i) => {
-                      const isEmpty = m.count === 0;
-                      return (
-                        <td key={i} className={`col-month lv-${m.level} ${isEmpty && m.level !== "excluded" ? "is-empty" : ""}`}>
-                          {m.percent == null ? "—" : `${m.percent}%`}
+                ) : groupResidentsByUnit(filtered, (x) => x.resident).map(g => (
+                  <React.Fragment key={g.unit}>
+                    <MatrixGroupRow unit={g.unit} colSpan={months.length + 3} />
+                    {g.rows.map(row => (
+                      <tr key={row.resident.id}>
+                        <td className="col-room">{row.resident.部屋番号}</td>
+                        <td className="col-name">
+                          <UnitDot resident={row.resident} />
+                          {row.resident.区分 === "短期" && <span className="short-mark">短</span>}
+                          {row.level === "excluded" && <span className="excluded-mark">除外</span>}
+                          {row.resident.名前}
+                          {row.resident.皮膚評価要 && <span className="skin-mark">皮</span>}
                         </td>
-                      );
-                    })}
-                    <td className={`col-total lv-${row.level}`}>
-                      {row.avg == null ? "—" : `${row.avg}%`}
-                    </td>
-                  </tr>
+                        {row.monthly.map((m, i) => {
+                          const isEmpty = m.count === 0;
+                          return (
+                            <td key={i} className={`col-month lv-${m.level} ${isEmpty && m.level !== "excluded" ? "is-empty" : ""}`}>
+                              {m.percent == null ? "—" : `${m.percent}%`}
+                            </td>
+                          );
+                        })}
+                        <td className={`col-total lv-${row.level}`}>
+                          {row.avg == null ? "—" : `${row.avg}%`}
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -5978,8 +5992,8 @@
           />
           <div className="data-card">
             <h3 className="data-card-title">🩹 皮膚評価一覧（主治医別）</h3>
-            <p className="data-card-desc">皮膚評価が必要な利用者を主治医別にまとめて印刷します。</p>
-            <button type="button" className="btn btn-primary" onClick={onOpenSkinPrint}>一覧を開く／印刷</button>
+            <p className="data-card-body">皮膚評価が必要な利用者を主治医別にまとめて印刷します。</p>
+            <button type="button" className="data-card-action is-primary" onClick={onOpenSkinPrint}>一覧を開く／印刷</button>
           </div>
           <AboutSection
             settings={data.settings}

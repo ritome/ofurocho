@@ -3162,16 +3162,26 @@
     }
 
     function BackupReminderModal({ open, lastBackupAt, onBackupNow, onLater }) {
-      // 経過日数（小数）
-      const hoursElapsed = lastBackupAt
+      const hasBackup = !!lastBackupAt;
+      const hoursElapsed = hasBackup
         ? (Date.now() - new Date(lastBackupAt).getTime()) / (1000 * 60 * 60)
-        : 999999;
-      const daysElapsed = Math.floor(hoursElapsed / 24);
-      const isCritical = daysElapsed >= 3;
-      const title = isCritical
+        : null;
+      const daysElapsed = hoursElapsed != null ? Math.floor(hoursElapsed / 24) : null;
+      const isCritical = !hasBackup || daysElapsed >= 3;
+
+      const title = !hasBackup
+        ? "⚠ まだ一度もバックアップしていません"
+        : isCritical
         ? `⚠ バックアップ未実施が${daysElapsed}日続いています`
         : "バックアップのお願い";
-      const lastLabel = lastBackupAt
+
+      const subtitle = !hasBackup
+        ? "データを守るため、今すぐバックアップしてください"
+        : daysElapsed > 0
+        ? `前回のバックアップから ${daysElapsed}日 経過しています`
+        : "前回のバックアップから24時間以上経過しています";
+
+      const lastLabel = hasBackup
         ? new Date(lastBackupAt).toLocaleString("ja-JP")
         : "未実施（このアプリでは一度もバックアップが取られていません）";
 
@@ -3182,7 +3192,7 @@
           dismissible={false}
           modalClass={`modal-backup-reminder ${isCritical ? "is-critical" : ""}`}
           title={title}
-          subtitle={daysElapsed > 0 ? `前回のバックアップから ${daysElapsed}日 経過しています` : "前回のバックアップから24時間以上経過しています"}
+          subtitle={subtitle}
           footer={
             <>
               <button type="button" className="btn btn-ghost" onClick={onLater}>

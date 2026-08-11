@@ -38,7 +38,7 @@
   <!-- React 18 + Babel + SheetJS（CDN、ビルド不要） -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -2345,7 +2345,7 @@
   <!-- ============================================================
        アプリ本体（Babel スタンドアロンでトランスパイル）
        ============================================================ -->
-  <script type="text/babel" data-presets="env,react">
+  <script type="text/babel" data-presets="react">
     const { useState, useEffect, useMemo, useCallback } = React;
 
     /* ============================================================

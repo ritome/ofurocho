@@ -652,10 +652,30 @@
     }
 
     .modal-header {
-      padding: 16px 20px 12px;
+      position: relative;
+      padding: 16px 44px 12px 20px;
       border-bottom: 1px solid var(--border);
       background: var(--bg-base);
     }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--text-soft);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .modal-close:hover { background: var(--accent-light); color: var(--text-primary); }
 
     .modal-title {
       font-size: 17px;
@@ -3634,16 +3654,34 @@
        モーダル基盤
        ============================================================ */
 
+    // 開いているモーダル数を数え、最後の1枚が閉じたときだけ body の overflow を復元する。
+    // （モーダルが重なるとき、各モーダルが個別に prev 値を保存/復元すると "hidden" が
+    //  書き戻され、全部閉じてもページがスクロール不能のまま固まる不具合を防ぐ。）
+    let __modalOpenCount = 0;
+    let __prevBodyOverflow = "";
+    const lockBodyScroll = () => {
+      if (__modalOpenCount === 0) {
+        __prevBodyOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+      }
+      __modalOpenCount++;
+    };
+    const unlockBodyScroll = () => {
+      __modalOpenCount = Math.max(0, __modalOpenCount - 1);
+      if (__modalOpenCount === 0) {
+        document.body.style.overflow = __prevBodyOverflow;
+      }
+    };
+
     function Modal({ open, onClose, title, subtitle, footer, children, headerExtra, dismissible = true, modalClass = "" }) {
       useEffect(() => {
         if (!open) return;
         const onKey = (e) => { if (e.key === "Escape" && dismissible) onClose(); };
         document.addEventListener("keydown", onKey);
-        const prevOverflow = document.body.style.overflow;
-        document.body.style.overflow = "hidden";
+        lockBodyScroll();
         return () => {
           document.removeEventListener("keydown", onKey);
-          document.body.style.overflow = prevOverflow;
+          unlockBodyScroll();
         };
       }, [open, onClose, dismissible]);
 
@@ -3660,6 +3698,9 @@
               <h2 className="modal-title">{title}</h2>
               {subtitle && <p className="modal-subtitle">{subtitle}</p>}
               {headerExtra}
+              {dismissible && (
+                <button type="button" className="modal-close" onClick={onClose} aria-label="閉じる">×</button>
+              )}
             </div>
             <div className="modal-body">{children}</div>
             {footer && <div className="modal-footer">{footer}</div>}

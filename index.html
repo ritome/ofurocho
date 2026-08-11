@@ -5207,6 +5207,10 @@
       const [customWeek, setCustomWeek] = useState(2);
       const [excluded, setExcluded] = useState(false);
       const [excludeReason, setExcludeReason] = useState("");
+      const [sex, setSex] = useState(target.性別 || "");
+      const [unit, setUnit] = useState(target.ユニット || "");
+      const [skinCheck, setSkinCheck] = useState(!!target.皮膚評価要);
+      const [doctor, setDoctor] = useState(target.主治医 || "");
 
       useEffect(() => {
         if (!open || !target) return;
@@ -5229,6 +5233,10 @@
           個別目標: (goalMode === "custom") ? { 週: Number(customWeek) || 1 } : null,
           目標除外: excluded,
           目標除外理由: excluded ? excludeReason.trim() : "",
+          性別: sex,
+          ユニット: unit.trim(),
+          皮膚評価要: skinCheck,
+          主治医: doctor.trim(),
         };
         onSave(next);
         onClose();
@@ -5248,6 +5256,37 @@
             </>
           }
         >
+          <div className="staff-edit-row">
+            <span className="staff-edit-label">性別</span>
+            <div className="staff-edit-radios">
+              <label className="staff-edit-radio">
+                <input type="radio" checked={sex === "男"} onChange={() => setSex("男")} /> 男
+              </label>
+              <label className="staff-edit-radio">
+                <input type="radio" checked={sex === "女"} onChange={() => setSex("女")} /> 女
+              </label>
+              <label className="staff-edit-radio">
+                <input type="radio" checked={sex === ""} onChange={() => setSex("")} /> 未設定
+              </label>
+            </div>
+          </div>
+          <div className="staff-edit-row">
+            <span className="staff-edit-label">ユニット</span>
+            <input type="text" className="staff-edit-input" placeholder="例：すみれ"
+              value={unit} onChange={(e) => setUnit(e.target.value)} />
+          </div>
+          <div className="staff-edit-row">
+            <span className="staff-edit-label">主治医</span>
+            <input type="text" className="staff-edit-input" placeholder="例：田中"
+              value={doctor} onChange={(e) => setDoctor(e.target.value)} />
+          </div>
+          <div className="staff-edit-row">
+            <span className="staff-edit-label">皮膚評価</span>
+            <label className="staff-edit-radio">
+              <input type="checkbox" checked={skinCheck} onChange={(e) => setSkinCheck(e.target.checked)} />
+              皮膚評価が必要（一覧にオレンジの「皮膚」バッジを表示）
+            </label>
+          </div>
           <div className="staff-edit-row">
             <span className="staff-edit-label">個別目標</span>
             <div className="staff-edit-radios">

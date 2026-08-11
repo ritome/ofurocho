@@ -36,7 +36,7 @@
   - `groupResidentsByUnit(rows, getResident) → [{ unit: string, rows: any[] }]`（入力順を保持、"その他" は末尾、他はユニット名の昇順）。Task 2-4 でも使用。
   - `EditRow({ resident, planSession, isBathedToday, lastDays, level, onTap })` — 1行を描画し、行タップで `onTap(resident.id)`。
 
-- [ ] **Step 1: 共有ヘルパー `groupResidentsByUnit` を追加**
+- [x] **Step 1: 共有ヘルパー `groupResidentsByUnit` を追加**
 
 `groupByUnit`（現 3405-3425 行）の閉じ `};` の直後に追加する:
 
@@ -61,7 +61,7 @@
     };
 ```
 
-- [ ] **Step 2: `EditRow` コンポーネントを追加**
+- [x] **Step 2: `EditRow` コンポーネントを追加**
 
 `ResidentRow`（現 3427-3473 行）の閉じ `}` の直後に追加する:
 
@@ -107,7 +107,7 @@
     }
 ```
 
-- [ ] **Step 3: 予定編集用CSSを追加**
+- [x] **Step 3: 予定編集用CSSを追加**
 
 行リストCSS群の末尾（`.res-row-skipbtn` の定義、現 351 行）の直後に追加する:
 
@@ -126,7 +126,7 @@
 
 注: `.res-row.is-warn .res-row-gbar` は既存の `.res-row.is-male/.is-female .res-row-gbar`（現 336-337 行）より後に定義されるため、同一詳細度で警告色が優先される。
 
-- [ ] **Step 4: `EditModeView` の描画を行リストに置換**
+- [x] **Step 4: `EditModeView` の描画を行リストに置換**
 
 `EditModeView` 内の `card-grid` ブロック（現 6362-6376 行）を置換する。置換前:
 
@@ -193,7 +193,7 @@
 
 注: `EditCard` コンポーネント本体（現 6136-6180 行）はこの置換で未使用になる。削除して構わない（`card-grid` のCSS 現 307-322 行は記録タブ以外で使われていないか確認し、他に参照が無ければ残置でも削除でも良い。判断がつかなければ残置する）。
 
-- [ ] **Step 5: ブラウザで確認**
+- [x] **Step 5: ブラウザで確認**
 
 ローカルで `index.html` を開く（`file://` 可）。URL に `?dev=1` を付ける。開発ツールバーの「サンプル投入」→「本日サンプル予定」を実行。記録画面の「予定を編集 →」で予定編集モードに入る。
 Expected:
@@ -203,7 +203,7 @@ Expected:
 - 並び替え・検索・フィルタ・日付ナビ（←→）・印刷ボタンが従来通り動作。
 - コンソールエラー0件。
 
-- [ ] **Step 6: コミット**
+- [x] **Step 6: コミット**
 
 ```bash
 git add index.html
@@ -228,7 +228,7 @@ git commit -m "feat: 予定編集モードをユニット別の行リストに�
   - `MatrixGroupRow({ unit, colSpan })` — ユニット見出しの `<tr>`。Task 3-4 でも使用。
   - CSSクラス `.unit-dot` / `.skin-mark` / `.matrix-group-row` と、3表共通のゼブラ。Task 3-4 でも使用。
 
-- [ ] **Step 1: 共有コンポーネントを追加**
+- [x] **Step 1: 共有コンポーネントを追加**
 
 `WeekMatrixView`（現 3979 行）の直前に追加する:
 
@@ -247,7 +247,7 @@ git commit -m "feat: 予定編集モードをユニット別の行リストに�
     }
 ```
 
-- [ ] **Step 2: 共有CSSを追加**
+- [x] **Step 2: 共有CSSを追加**
 
 `.matrix-table tfoot td { ... }`（現 1035-1041 行あたり）の閉じ `}` の直後に追加する:
 
@@ -270,7 +270,7 @@ git commit -m "feat: 予定編集モードをユニット別の行リストに�
 
 注: `.matrix-table thead th` には既に `position: sticky; top: 0`（現 989-996 行）がある。ゼブラは `> td` に background を当て、グループ行（`.matrix-group-row td` の background）が上書きされないようにする。
 
-- [ ] **Step 3: `WeekMatrixView` の `col-name` に色ドットと皮膚マークを追加**
+- [x] **Step 3: `WeekMatrixView` の `col-name` に色ドットと皮膚マークを追加**
 
 `WeekMatrixView` の `col-name` セル（現 4071-4074 行）を置換する。置換前:
 
@@ -292,7 +292,7 @@ git commit -m "feat: 予定編集モードをユニット別の行リストに�
                       </td>
 ```
 
-- [ ] **Step 4: `WeekMatrixView` の `<tbody>` をユニット別グループに置換**
+- [x] **Step 4: `WeekMatrixView` の `<tbody>` をユニット別グループに置換**
 
 `<tbody>` の中身（現 4063-4096 行）を置換する。置換前は `rows.length === 0 ? (...) : rows.map(row => { ... })`。置換後:
 
@@ -341,7 +341,7 @@ git commit -m "feat: 予定編集モードをユニット別の行リストに�
 
 注: Step 3 と Step 4 は同じ `col-name` セルを扱う。Step 4 の置換後コードに色ドット・皮膚マークが含まれているため、Step 4 を適用すれば Step 3 の内容も満たされる（順序通り編集すれば重複しない。もし Step 4 を先に適用した場合は Step 3 はスキップしてよい）。
 
-- [ ] **Step 5: ブラウザで確認**
+- [x] **Step 5: ブラウザで確認**
 
 `?dev=1` で開き、「サンプル投入」→「過去60日履歴」を実行。記録一覧タブ →「週」表示。
 Expected:
@@ -350,7 +350,7 @@ Expected:
 - 検索・短期のみ・警告のみフィルタ、Excel出力、印刷が従来通り。
 - コンソールエラー0件。
 
-- [ ] **Step 6: コミット**
+- [x] **Step 6: コミット**
 
 ```bash
 git add index.html
@@ -369,7 +369,7 @@ git commit -m "feat: 記録一覧(週)をユニット別グループ・色ドッ
 **Interfaces:**
 - Consumes: Task 1 の `groupResidentsByUnit`、Task 2 の `UnitDot` / `MatrixGroupRow`。`rows`（要素 `{ resident, level, count, percent, ... }`）。この表の列数は 4（部屋・利用者・入浴回数・達成率）。
 
-- [ ] **Step 1: `<tbody>` をユニット別グループに置換**
+- [x] **Step 1: `<tbody>` をユニット別グループに置換**
 
 `MonthAchievementView` の `<tbody>` 中身（現 4218-4255 行）を置換する。置換後:
 
@@ -421,12 +421,12 @@ git commit -m "feat: 記録一覧(週)をユニット別グループ・色ドッ
                 ))}
 ```
 
-- [ ] **Step 2: ブラウザで確認**
+- [x] **Step 2: ブラウザで確認**
 
 `?dev=1`＋履歴投入済みの状態で、記録一覧タブ →「月」表示。
 Expected: ユニット別見出し・色ドット・「皮」マークが出て、達成率バー・除外表示・月サマリ・未達成のみフィルタが従来通り。ヘッダー固定・ゼブラが効く。コンソールエラー0件。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add index.html
@@ -445,7 +445,7 @@ git commit -m "feat: 記録一覧(月達成率)をユニット別グループ・
 **Interfaces:**
 - Consumes: Task 1 の `groupResidentsByUnit`、Task 2 の `UnitDot` / `MatrixGroupRow`。`filtered`（要素 `{ resident, monthly, avg, level }`）。この表の列数は `months.length + 3`（部屋・利用者・各月・期間平均）。
 
-- [ ] **Step 1: `<tbody>` をユニット別グループに置換**
+- [x] **Step 1: `<tbody>` をユニット別グループに置換**
 
 `PeriodGridView` の `<tbody>` 中身（現 4339-4361 行）を置換する。`filtered` を使う点に注意。置換後:
 
@@ -482,12 +482,12 @@ git commit -m "feat: 記録一覧(月達成率)をユニット別グループ・
                 ))}
 ```
 
-- [ ] **Step 2: ブラウザで確認**
+- [x] **Step 2: ブラウザで確認**
 
 記録一覧タブ →「半年」→「年」を切替。
 Expected: ユニット別見出し・色ドット・「皮」マークが出て、月別％・除外「—」・期間平均・未達成のみフィルタが従来通り。年（12ヶ月）でも横スクロールでき、ヘッダー固定・ゼブラが効く。印刷（半年/年は横向き）が従来通り。コンソールエラー0件。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add index.html
@@ -506,7 +506,7 @@ git commit -m "feat: 記録一覧(半年/年)をユニット別グループ・�
 **Interfaces:**
 - Consumes: `SettingsTab` の `onOpenSkinPrint`。
 
-- [ ] **Step 1: 皮膚評価カードを共通様式に統一**
+- [x] **Step 1: 皮膚評価カードを共通様式に統一**
 
 `SettingsTab` 内の皮膚評価カード（現 5875-5879 行）を置換する。置換前:
 
@@ -530,12 +530,12 @@ git commit -m "feat: 記録一覧(半年/年)をユニット別グループ・�
 
 注: これにより未定義だった `.data-card-desc` への依存が無くなり、v1 の Minor 指摘（`.data-card-desc` にCSSが無い）も解消する。新規CSSは不要。
 
-- [ ] **Step 2: ブラウザで確認**
+- [x] **Step 2: ブラウザで確認**
 
 設定タブを開く。
 Expected: 皮膚評価カードが他のデータカード（バックアップ等）と同じ見出し・本文・ボタン様式で揃って表示され、「一覧を開く／印刷」で皮膚評価一覧が開く。他カードの操作は従来通り。コンソールエラー0件。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add index.html
@@ -554,7 +554,7 @@ git commit -m "feat: 設定タブの皮膚評価カードを共通カード様�
 **Interfaces:**
 - なし。
 
-- [ ] **Step 1: `CACHE_NAME` を v5 へ**
+- [x] **Step 1: `CACHE_NAME` を v5 へ**
 
 `sw.js` の 4 行目を置換する。置換前 `const CACHE_NAME = 'ofurocho-v4';`、置換後:
 
@@ -562,7 +562,7 @@ git commit -m "feat: 設定タブの皮膚評価カードを共通カード様�
 const CACHE_NAME = 'ofurocho-v5';
 ```
 
-- [ ] **Step 2: ブラウザで確認（互換・回帰の最終確認）**
+- [x] **Step 2: ブラウザで確認（互換・回帰の最終確認）**
 
 `?dev=1` で全機能を通しで確認する。
 Expected:
@@ -570,7 +570,7 @@ Expected:
 - 記録タブ（v1）が影響を受けていない。
 - 予定編集／記録一覧（週・月・半年・年）／設定を一通り開いてコンソールエラー0件。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add sw.js
